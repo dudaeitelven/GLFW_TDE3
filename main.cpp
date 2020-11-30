@@ -37,6 +37,8 @@ float specularStrength = 0.5;
 
 int main()
 {
+    const float radius = 4.0f;
+
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -186,7 +188,6 @@ int main()
         //lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
 
         //Luz dando volta no Objeto!
-        const float radius = 4.0f;
         lightPos.x = sin(glfwGetTime()) * radius;
         lightPos.y = cos(glfwGetTime()) * radius;
 
