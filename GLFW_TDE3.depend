@@ -1,8 +1,8 @@
 # depslib dependency file v1.0
-1603045934 source:/home/krohn/LinguagemC/GLFW_Iluminacao_2/stb_image.cpp
+1603045934 source:/home/krohn/LinguagemC/GLFW_TDE3/stb_image.cpp
 	"stb_image.h"
 
-1603045863 /home/krohn/LinguagemC/GLFW_Iluminacao_2/stb_image.h
+1603045863 /home/krohn/LinguagemC/GLFW_TDE3/stb_image.h
 	"stb_image.h"
 	<stdio.h>
 	<stdlib.h>
@@ -19,7 +19,7 @@
 	<intrin.h>
 	<arm_neon.h>
 
-1606252067 source:/home/krohn/LinguagemC/GLFW_Iluminacao_2/main.cpp
+1606252067 source:/home/krohn/LinguagemC/GLFW_TDE3/main.cpp
 	<GL/glew.h>
 	<GLFW/glfw3.h>
 	<glm/glm.hpp>
@@ -29,7 +29,7 @@
 	"camera.h"
 	<iostream>
 
-1605555989 /home/krohn/LinguagemC/GLFW_Iluminacao_2/shader_m.h
+1605555989 /home/krohn/LinguagemC/GLFW_TDE3/shader_m.h
 	<GL/glew.h>
 	<glm/glm.hpp>
 	<string>
@@ -37,7 +37,7 @@
 	<sstream>
 	<iostream>
 
-1605555997 /home/krohn/LinguagemC/GLFW_Iluminacao_2/camera.h
+1605555997 /home/krohn/LinguagemC/GLFW_TDE3/camera.h
 	<GL/glew.h>
 	<glm/glm.hpp>
 	<glm/gtc/matrix_transform.hpp>
