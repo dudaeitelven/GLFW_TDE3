@@ -43,9 +43,10 @@
 	<glm/gtc/matrix_transform.hpp>
 	<vector>
 
-1606782470 source:c:\users\eduardo\documents\wscodeblocks\cg\glfw_tde3\main.cpp
+1606791193 source:c:\users\eduardo\documents\wscodeblocks\cg\glfw_tde3\main.cpp
 	<GL/glew.h>
 	<GLFW/glfw3.h>
+	"glm/gtx/string_cast.hpp"
 	<glm/glm.hpp>
 	<glm/gtc/matrix_transform.hpp>
 	<glm/gtc/type_ptr.hpp>
@@ -1022,4 +1023,56 @@
 	<emmintrin.h>
 	<intrin.h>
 	<arm_neon.h>
+
+1586799676 c:\glm\glm\gtx\string_cast.hpp
+	"../glm.hpp"
+	"../gtc/type_precision.hpp"
+	"../gtc/quaternion.hpp"
+	"../gtx/dual_quaternion.hpp"
+	<string>
+	<cmath>
+	"string_cast.inl"
+
+1586799676 c:\glm\glm\gtc\type_precision.hpp
+	"../gtc/quaternion.hpp"
+	"../gtc/vec1.hpp"
+	"../ext/vector_int1_sized.hpp"
+	"../ext/vector_int2_sized.hpp"
+	"../ext/vector_int3_sized.hpp"
+	"../ext/vector_int4_sized.hpp"
+	"../ext/scalar_int_sized.hpp"
+	"../ext/vector_uint1_sized.hpp"
+	"../ext/vector_uint2_sized.hpp"
+	"../ext/vector_uint3_sized.hpp"
+	"../ext/vector_uint4_sized.hpp"
+	"../ext/scalar_uint_sized.hpp"
+	"../detail/type_vec2.hpp"
+	"../detail/type_vec3.hpp"
+	"../detail/type_vec4.hpp"
+	"../detail/type_mat2x2.hpp"
+	"../detail/type_mat2x3.hpp"
+	"../detail/type_mat2x4.hpp"
+	"../detail/type_mat3x2.hpp"
+	"../detail/type_mat3x3.hpp"
+	"../detail/type_mat3x4.hpp"
+	"../detail/type_mat4x2.hpp"
+	"../detail/type_mat4x3.hpp"
+	"../detail/type_mat4x4.hpp"
+	"type_precision.inl"
+
+1586799676 c:\glm\glm\gtc\type_precision.inl
+
+1586799676 c:\glm\glm\gtx\dual_quaternion.hpp
+	"../glm.hpp"
+	"../gtc/constants.hpp"
+	"../gtc/quaternion.hpp"
+	"dual_quaternion.inl"
+
+1586799676 c:\glm\glm\gtx\dual_quaternion.inl
+	"../geometric.hpp"
+	<limits>
+
+1586799676 c:\glm\glm\gtx\string_cast.inl
+	<cstdarg>
+	<cstdio>
 

@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "glm/gtx/string_cast.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -9,6 +10,8 @@
 #include "camera.h"
 
 #include <iostream>
+
+
 
 #define arquivo "cubo.csv"
 
@@ -120,6 +123,18 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+//    // position attribute
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+//    glEnableVertexAttribArray(0);
+//    // color attribute
+//    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+//    glEnableVertexAttribArray(1);
+//    // texture coord attribute
+//    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(2 * sizeof(float)));
+//    glEnableVertexAttribArray(2);
+//    // normal attribute
+//    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+//    glEnableVertexAttribArray(3);
 
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
     unsigned int lightCubeVAO;
@@ -162,8 +177,8 @@ int main()
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
-        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        lightingShader.setVec3("objectColor", 1.0f, 1.0f, 1.0f);
+        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 0.0f);
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
         lightingShader.setFloat("specularStrength",specularStrength);
@@ -339,7 +354,23 @@ void carregarVetor ()
                 pch = strtok(NULL, ";"); //Procura próximo token
             }
         }
+
     }
+
+//    glm::vec3 va(-0.5f, -0.5f, -0.5f);
+//    glm::vec3 vb(0.5f, -0.5f, -0.5f);
+//    glm::vec3 vc(0.5f, 0.5f, -0.5f);
+//
+//    glm::vec3 ab = vb - va;
+//    glm::vec3 ac = vc - va;
+//
+//    ab = normalize(ab);
+//    ac = normalize(ac);
+//
+//    glm::vec3 vNormal = cross(ab,ac);
+//
+//
+//    std::cout<<glm::to_string(vNormal)<<std::endl;
 
     fclose(arqin);
 }
