@@ -10,10 +10,14 @@
 
 #include <iostream>
 
+#define arquivo "cubo.csv"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+void contarLinhas();
+void carregarVetor();
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -34,6 +38,12 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 // Reflexo especular
 float specularStrength = 0.5;
+
+//Vertices
+float *vertices;
+
+//Linhas do arquivo
+int linhas = 1;
 
 int main()
 {
@@ -90,58 +100,16 @@ int main()
 
     Shader lightCubeShader("light_cube.vs", "light_cube.fs");
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+    //Carregar as coordernadas do desenho no vetor
+    carregarVetor();
 
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-    };
     // first, configure the cube's VAO (and VBO)
     unsigned int VBO, cubeVAO;
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &VBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhas*6), &vertices[0], GL_STATIC_DRAW);
 
     glBindVertexArray(cubeVAO);
 
@@ -314,4 +282,67 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
 }
+
+void contarLinhas()
+{
+    char c;
+
+    // 1ª abertura do arquivo para Verificar tamanho!
+    FILE *arqin = fopen(arquivo, "rt"); // é um char criar define
+    if (!arqin)
+    {
+        printf("Erro na abertura de %s %d\n",arquivo,strlen(arquivo));
+        exit(0);
+    }
+
+    while(fread (&c, sizeof(char), 1, arqin))
+    {
+        if(c == '\n') linhas++;
+    }
+
+    printf("Linhas: %d \n",linhas);
+
+    fclose(arqin);
+}
+
+void carregarVetor ()
+{
+    int i = 0;
+    char c;
+    char linha[100];
+    char *pch;
+    char *linhaComentario;
+
+    contarLinhas();
+    vertices = (float *)malloc((linhas * 6)*sizeof(float));
+
+    //2ª abertura do arquivo para popular Vetor de Vertices
+    FILE *arqin = fopen(arquivo, "rt");
+    while (!feof(arqin))
+    {
+        fgets(linha, 100, arqin);
+
+        linhaComentario = strstr(linha, "//");
+
+        if (linhaComentario == NULL) {
+            pch = strtok(linha, ";");
+            while (pch != NULL) //Enquanto houver token
+            {
+                int validarNumerico = strcmp(pch,"\n");
+                if (validarNumerico) {
+                    *(vertices+i) =  atof(pch);
+                    //vertices[i] =  atof(pch);
+
+                    printf("vertices[%d]: %f\n ",i,vertices[i]);
+                    i++;
+                }
+
+                pch = strtok(NULL, ";"); //Procura próximo token
+            }
+        }
+    }
+
+    fclose(arqin);
+}
+
 
