@@ -361,16 +361,10 @@ void carregarVetor ()
 //    glm::vec3 vb(0.5f, -0.5f, -0.5f);
 //    glm::vec3 vc(0.5f, 0.5f, -0.5f);
 //
-//    glm::vec3 ab = vb - va;
-//    glm::vec3 ac = vc - va;
+//    glm::vec3 normal = normalize(cross(vc - va,vb - va));
 //
-//    ab = normalize(ab);
-//    ac = normalize(ac);
-//
-//    glm::vec3 vNormal = cross(ab,ac);
-//
-//
-//    std::cout<<glm::to_string(vNormal)<<std::endl;
+//    std::cout<<glm::to_string(normal)<<std::endl;
+
 
     fclose(arqin);
 }
