@@ -10,7 +10,7 @@
 #include <iostream>
 
 
-#define arquivo "casa.csv"
+#define arquivo "ArqGrav.csv"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -47,7 +47,7 @@ int linhas = 1;
 
 int main()
 {
-    geraVetorNormal();
+    //geraVetorNormal();
 
     const float radius = 4.0f;
 
@@ -106,49 +106,40 @@ int main()
     Shader lightCubeShader("light_cube.vs", "light_cube.fs");
 
     //Carregar as coordernadas do desenho no vetor
-    //carregarVetor();
-
-
+    carregarVetor();
 
 
     // first, configure the cube's VAO (and VBO)
-    unsigned int VBO, cubeVAO;
-    glGenVertexArrays(1, &cubeVAO);
+    unsigned int VBO, casaVAO;
+    glGenVertexArrays(1, &casaVAO);
     glGenBuffers(1, &VBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhas*6), &vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhas*11), &vertices[0], GL_STATIC_DRAW);
 
-    glBindVertexArray(cubeVAO);
+    glBindVertexArray(casaVAO);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-//    // position attribute
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-//    glEnableVertexAttribArray(0);
-//    // color attribute
-//    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-//    glEnableVertexAttribArray(1);
-//    // texture coord attribute
-//    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(2 * sizeof(float)));
-//    glEnableVertexAttribArray(2);
-//    // normal attribute
-//    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-//    glEnableVertexAttribArray(3);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
 
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-    unsigned int lightCubeVAO;
-    glGenVertexArrays(1, &lightCubeVAO);
-    glBindVertexArray(lightCubeVAO);
+    unsigned int lightcasaVAO;
+    glGenVertexArrays(1, &lightcasaVAO);
+    glBindVertexArray(lightcasaVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // note that we update the lamp's position attribute's stride to reflect the updated buffer data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
 
@@ -171,9 +162,6 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // change the light's position values over time (can be done anywhere in the render loop actually, but try to do it at least before using the light source positions)
-        //lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-        //lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
 
         //Luz dando volta no Objeto!
         lightPos.x = sin(glfwGetTime()) * radius;
@@ -201,7 +189,7 @@ int main()
         lightingShader.setMat4("model", model);
 
         // render the cube
-        glBindVertexArray(cubeVAO);
+        glBindVertexArray(casaVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhas);
 
 
@@ -214,7 +202,7 @@ int main()
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lightCubeShader.setMat4("model", model);
 
-        glBindVertexArray(lightCubeVAO);
+        glBindVertexArray(lightcasaVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhas);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -225,8 +213,8 @@ int main()
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &cubeVAO);
-    glDeleteVertexArrays(1, &lightCubeVAO);
+    glDeleteVertexArrays(1, &casaVAO);
+    glDeleteVertexArrays(1, &lightcasaVAO);
     glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
@@ -407,7 +395,7 @@ void geraVetorNormal ()
             char Str[100];
             FILE *arq;
 
-            arq = fopen("ArqGrav.txt", "a+");  // Cria um arquivo texto para gravação
+            arq = fopen("ArqGrav.csv", "a+");
             if (arq == NULL) // Se não conseguiu criar
             {
                 printf("Problemas na CRIACAO do arquivo\n");
@@ -433,9 +421,7 @@ void geraVetorNormal ()
                 //fputs(';',arq);
 
             }
-
             fclose(arq);
-
             contLinhas = 0;
             contQuebraLinha = 0;
             if (feof(arqin2)){
@@ -445,10 +431,7 @@ void geraVetorNormal ()
         else
         {
 
-
-
             fgets(linha, 100, arqin2);
-
             linhaComentario = strstr(linha, "//");
 
             if (linhaComentario == NULL)
