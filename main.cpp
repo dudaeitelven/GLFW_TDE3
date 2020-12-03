@@ -10,7 +10,7 @@
 #include <iostream>
 
 
-#define arquivo "testeLeitura.csv"
+#define arquivo "casa.csv"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -81,9 +81,12 @@ int main()
 
     // glew: load all OpenGL function pointers
     // ---------------------------------------
-    if(glewInit()!=GLEW_OK) {
+    if(glewInit()!=GLEW_OK)
+    {
         std::cout << "Ocorreu um erro iniciando GLEW!" << std::endl;
-    } else {
+    }
+    else
+    {
         std::cout << "GLEW OK!" << std::endl;
         std::cout << glGetString(GL_VERSION) << std::endl;
     }
@@ -247,13 +250,15 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+    {
         specularStrength += 0.01f;
         if(specularStrength > 5.0f)
             specularStrength = 5.0f;
         std::cout << "Especular = " << specularStrength << std::endl;
     }
-    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+    {
         specularStrength -= 0.01f;
         if(specularStrength < 0.0f)
             specularStrength = 0.0f;
@@ -340,12 +345,14 @@ void carregarVetor ()
 
         linhaComentario = strstr(linha, "//");
 
-        if (linhaComentario == NULL) {
+        if (linhaComentario == NULL)
+        {
             pch = strtok(linha, ";");
             while (pch != NULL) //Enquanto houver token
             {
                 int validarNumerico = strcmp(pch,"\n");
-                if (validarNumerico) {
+                if (validarNumerico)
+                {
                     *(vertices+i) =  atof(pch);
                     //vertices[i] =  atof(pch);
 
@@ -359,21 +366,12 @@ void carregarVetor ()
 
     }
 
-//    glm::vec3 va(-0.5f, -0.5f, -0.5f);
-//    glm::vec3 vb(0.5f, -0.5f, -0.5f);
-//    glm::vec3 vc(0.5f, 0.5f, -0.5f);
-//
-//    glm::vec3 normal = normalize(cross(vc - va,vb - va));
-//
-//    std::cout<<glm::to_string(normal)<<std::endl;
-
-
     fclose(arqin);
 }
 
 void geraVetorNormal ()
 {
-    int i = 0;
+    int i = 0,z = 0;
     int contLinhas = 0;
     int controle = 0;
     int ultimaPosicao = 0;
@@ -381,6 +379,7 @@ void geraVetorNormal ()
     char linha[100];
     char *pch;
     char *linhaComentario;
+    int contQuebraLinha = 0;
 
 
     contarLinhas();
@@ -404,19 +403,57 @@ void geraVetorNormal ()
             glm::vec3 normal = normalize(cross(vc - va,vb - va));
             //std::cout<<glm::to_string(normal)<<std::endl;
 
+
+            char Str[100];
+            FILE *arq;
+
+            arq = fopen("ArqGrav.txt", "a+");  // Cria um arquivo texto para gravação
+            if (arq == NULL) // Se não conseguiu criar
+            {
+                printf("Problemas na CRIACAO do arquivo\n");
+                return;
+            }
+
+            for (z = (ultimaPosicao - 24); z < ultimaPosicao ; z++)
+            {
+                fprintf(arq,"%-5.2f;",verticesNormal[z]);
+
+                contQuebraLinha++;
+                if (contQuebraLinha == 8)
+                {
+                    fprintf(arq,"%-5.2f;",normal[0]);
+                    fprintf(arq,"%-5.2f;",normal[1]);
+                    fprintf(arq,"%-5.2f;",normal[2]);
+                    fprintf(arq,"\n");
+                    contQuebraLinha = 0;
+                }
+
+
+                //fputs(verticesNormal[z],arq);
+                //fputs(';',arq);
+
+            }
+
+            fclose(arq);
+
             contLinhas = 0;
-            if (feof(arqin2))
+            contQuebraLinha = 0;
+            if (feof(arqin2)){
                 controle = 0;
+            }
         }
         else
         {
-            contLinhas++;
+
+
+
             fgets(linha, 100, arqin2);
 
             linhaComentario = strstr(linha, "//");
 
             if (linhaComentario == NULL)
             {
+                contLinhas++;
                 pch = strtok(linha, ";");
                 while (pch != NULL) //Enquanto houver token
                 {
@@ -435,9 +472,11 @@ void geraVetorNormal ()
     }
 
 
-//    glm::vec3 va(-0.5f, -0.5f, -0.5f);
-//    glm::vec3 vb(0.5f, -0.5f, -0.5f);
-//    glm::vec3 vc(0.5f, 0.5f, -0.5f);
+//   glm::vec3 va(0.50 ,0.50 ,-0.50);
+//    glm::vec3 vb(0.50 ,0.50 ,-0.50);
+//    glm::vec3 vc(-0.50,0.50 ,-0.50);
+//
+//
 //
 //    glm::vec3 normal = normalize(cross(vc - va,vb - va));
 //
