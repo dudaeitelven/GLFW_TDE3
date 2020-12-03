@@ -5,15 +5,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include "shader_m.h"
 #include "camera.h"
-
 #include <iostream>
 
 
-
-#define arquivo "cubo.csv"
+#define arquivo "testeLeitura.csv"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -21,7 +18,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 void contarLinhas();
 void carregarVetor();
-
+void geraVetorNormal ();
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -44,12 +41,14 @@ float specularStrength = 0.5;
 
 //Vertices
 float *vertices;
-
+float *verticesNormal;
 //Linhas do arquivo
 int linhas = 1;
 
 int main()
 {
+    geraVetorNormal();
+
     const float radius = 4.0f;
 
     // glfw: initialize and configure
@@ -104,7 +103,10 @@ int main()
     Shader lightCubeShader("light_cube.vs", "light_cube.fs");
 
     //Carregar as coordernadas do desenho no vetor
-    carregarVetor();
+    //carregarVetor();
+
+
+
 
     // first, configure the cube's VAO (and VBO)
     unsigned int VBO, cubeVAO;
@@ -368,5 +370,83 @@ void carregarVetor ()
 
     fclose(arqin);
 }
+
+void geraVetorNormal ()
+{
+    int i = 0;
+    int contLinhas = 0;
+    int controle = 0;
+    int ultimaPosicao = 0;
+    char c;
+    char linha[100];
+    char *pch;
+    char *linhaComentario;
+
+
+    contarLinhas();
+
+    verticesNormal = (float *)malloc((linhas * 8)*sizeof(float));
+
+    //2ª abertura do arquivo para popular Vetor de Vertices
+    FILE *arqin2 = fopen(arquivo, "rt");
+    controle = 1;
+    while (!feof(arqin2) && controle == 1)
+    {
+
+        if(contLinhas == 3)
+        {
+            glm::vec3 va(verticesNormal[ultimaPosicao - 24], verticesNormal[ultimaPosicao - 23], verticesNormal[ultimaPosicao - 22]);
+            //std::cout<<glm::to_string(va)<<std::endl;
+            glm::vec3 vb(verticesNormal[ultimaPosicao - 16], verticesNormal[ultimaPosicao - 15], verticesNormal[ultimaPosicao - 14]);
+            //std::cout<<glm::to_string(vb)<<std::endl;
+            glm::vec3 vc(verticesNormal[ultimaPosicao - 8], verticesNormal[ultimaPosicao - 7], verticesNormal[ultimaPosicao - 6]);
+            //std::cout<<glm::to_string(vc)<<std::endl;
+            glm::vec3 normal = normalize(cross(vc - va,vb - va));
+            //std::cout<<glm::to_string(normal)<<std::endl;
+
+            contLinhas = 0;
+            if (feof(arqin2))
+                controle = 0;
+        }
+        else
+        {
+            contLinhas++;
+            fgets(linha, 100, arqin2);
+
+            linhaComentario = strstr(linha, "//");
+
+            if (linhaComentario == NULL)
+            {
+                pch = strtok(linha, ";");
+                while (pch != NULL) //Enquanto houver token
+                {
+                    int validarNumerico = strcmp(pch,"\n");
+                    if (validarNumerico)
+                    {
+                        *(verticesNormal+i) =  atof(pch);
+                        //printf("verticesNormal[%d]: %f\n ",i,verticesNormal[i]);
+                        i++;
+                        ultimaPosicao = i;
+                    }
+                    pch = strtok(NULL, ";"); //Procura próximo token
+                }
+            }
+        }
+    }
+
+
+//    glm::vec3 va(-0.5f, -0.5f, -0.5f);
+//    glm::vec3 vb(0.5f, -0.5f, -0.5f);
+//    glm::vec3 vc(0.5f, 0.5f, -0.5f);
+//
+//    glm::vec3 normal = normalize(cross(vc - va,vb - va));
+//
+//    std::cout<<glm::to_string(normal)<<std::endl;
+
+
+    fclose(arqin2);
+}
+
+
 
 
