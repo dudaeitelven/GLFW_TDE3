@@ -1,16 +1,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
 #include "glm/gtx/string_cast.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "shader_m.h"
 #include "camera.h"
+#include "include/stb_image.h"
+#include "include/Shader.h"
 #include <iostream>
-
-
-//#define arquivo "ArqGrav.csv"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -96,19 +94,13 @@ int main()
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightingShader("phong_lighting.vs", "phong_lighting.fs");
-
     Shader lightCubeShader("light_cube.vs", "light_cube.fs");
 
     //Carregar as coordernadas do desenho no vetor
-
-
-    //float *vertices = (float *)malloc((linhas * 8)*sizeof(float));
-
     char arqCasa[] = "arqCasa.csv";
     int linhasCasa = contarLinhas(arqCasa);
     float *verticesCasa = (float *)malloc((linhasCasa * 11)*sizeof(float));
     carregarVetor(verticesCasa,arqCasa);
-
 
     // first, configure the cube's VAO (and VBO)
     unsigned int VBO, casaVAO;
@@ -132,6 +124,50 @@ int main()
     // normal attribute
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
     glEnableVertexAttribArray(3);
+
+    // load and create a texture
+    // -------------------------
+    unsigned int texture[2];
+    glGenTextures(2, &texture[0]);
+    glBindTexture(GL_TEXTURE_2D, texture[0]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+
+    // set the texture wrapping parameters
+    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // set texture filtering parameters
+    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load image, create texture and generate mipmaps
+    int width, height, nrChannels;
+
+    // Imagens são carregadas de baixo para cima. Precisam ser invertidas
+    stbi_set_flip_vertically_on_load(1);
+
+    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
+    // NPOT (Not Power-of-Two)
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("res/images/gremio2.png", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        // Se a imagem for PNG com transparência
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        // Se a imagem for JPG, e portanto sem transparência
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
 
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
     unsigned int lightcasaVAO;
@@ -160,14 +196,14 @@ int main()
 
         // render
         // ------
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glBindTexture(GL_TEXTURE_2D, texture[0]);
 
         //Luz dando volta no Objeto!
         lightPos.x = sin(glfwGetTime()) * radius;
         lightPos.y = cos(glfwGetTime()) * radius;
-
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
