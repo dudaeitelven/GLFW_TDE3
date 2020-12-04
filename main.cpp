@@ -97,6 +97,7 @@ int main()
     Shader lightCubeShader("light_cube.vs", "light_cube.fs");
 
     //Carregar as coordernadas do desenho no vetor
+    //char arqCasa[] = "res/arquivos/folhasArvore.csv";
     char arqCasa[] = "arqCasa.csv";
     int linhasCasa = contarLinhas(arqCasa);
     float *verticesCasa = (float *)malloc((linhasCasa * 11)*sizeof(float));
@@ -153,7 +154,7 @@ int main()
     // NPOT (Not Power-of-Two)
     //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
-    unsigned char *data = stbi_load("res/images/gremio2.png", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("res/images/grama.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         // Se a imagem for PNG com transparência
@@ -202,8 +203,8 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture[0]);
 
         //Luz dando volta no Objeto!
-        lightPos.x = sin(glfwGetTime()) * radius;
-        lightPos.y = cos(glfwGetTime()) * radius;
+        lightPos.x = sin(glfwGetTime()*0.5) * radius;
+        lightPos.y = cos(glfwGetTime()*0.5) * radius;
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
@@ -230,16 +231,16 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, linhasCasa*11);
 
 
-        // also draw the lamp object
-        //lightCubeShader.use();
-        //lightCubeShader.setMat4("projection", projection);
-        //lightCubeShader.setMat4("view", view);
-        //model = glm::mat4(1.0f);
-        //model = glm::translate(model, lightPos);
-        //model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        //lightCubeShader.setMat4("model", model);
+         //also draw the lamp object
+        lightCubeShader.use();
+        lightCubeShader.setMat4("projection", projection);
+        lightCubeShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        lightCubeShader.setMat4("model", model);
 
-//        glBindVertexArray(lightcasaVAO);
+        glBindVertexArray(lightcasaVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhasCasa);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -251,7 +252,7 @@ int main()
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &casaVAO);
-    //glDeleteVertexArrays(1, &lightcasaVAO);
+    glDeleteVertexArrays(1, &lightcasaVAO);
     glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
