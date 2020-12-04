@@ -133,14 +133,14 @@ int main()
     glEnableVertexAttribArray(3);
 
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-    unsigned int lightcasaVAO;
-    glGenVertexArrays(1, &lightcasaVAO);
-    glBindVertexArray(lightcasaVAO);
+//    unsigned int lightcasaVAO;
+//    glGenVertexArrays(1, &lightcasaVAO);
+//    glBindVertexArray(lightcasaVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // note that we update the lamp's position attribute's stride to reflect the updated buffer data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+   // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    //glEnableVertexAttribArray(0);
 
 
     // render loop
@@ -164,14 +164,14 @@ int main()
 
 
         //Luz dando volta no Objeto!
-        lightPos.x = sin(glfwGetTime()) * radius;
-        lightPos.y = cos(glfwGetTime()) * radius;
+//        lightPos.x = sin(glfwGetTime()) * radius;
+//        lightPos.y = cos(glfwGetTime()) * radius;
 
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
         lightingShader.setVec3("objectColor", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 0.0f);
+        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
         lightingShader.setFloat("specularStrength",specularStrength);
@@ -190,19 +190,19 @@ int main()
 
         // render the cube
         glBindVertexArray(casaVAO);
-        glDrawArrays(GL_TRIANGLES, 0, linhas);
+        glDrawArrays(GL_TRIANGLES, 0, linhas*11);
 
 
         // also draw the lamp object
-        lightCubeShader.use();
-        lightCubeShader.setMat4("projection", projection);
-        lightCubeShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        lightCubeShader.setMat4("model", model);
+        //lightCubeShader.use();
+        //lightCubeShader.setMat4("projection", projection);
+        //lightCubeShader.setMat4("view", view);
+        //model = glm::mat4(1.0f);
+        //model = glm::translate(model, lightPos);
+        //model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        //lightCubeShader.setMat4("model", model);
 
-        glBindVertexArray(lightcasaVAO);
+//        glBindVertexArray(lightcasaVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhas);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -214,7 +214,7 @@ int main()
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &casaVAO);
-    glDeleteVertexArrays(1, &lightcasaVAO);
+    //glDeleteVertexArrays(1, &lightcasaVAO);
     glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
@@ -323,7 +323,7 @@ void carregarVetor ()
     char *linhaComentario;
 
     contarLinhas();
-    vertices = (float *)malloc((linhas * 6)*sizeof(float));
+    vertices = (float *)malloc((linhas * 11)*sizeof(float));
 
     //2ª abertura do arquivo para popular Vetor de Vertices
     FILE *arqin = fopen(arquivo, "rt");
