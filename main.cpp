@@ -16,7 +16,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 int contarLinhas(char arquivoLeitura[]);
 void carregarVetor (float *vertices, char arquivoLeitura[]);
-void geraVetorNormal ();
+void geraVetorNormal (char nomeArquivoLeitura[], char nomeArquivoEscrita[]);
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -37,17 +38,17 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 // Reflexo especular
 float specularStrength = 0.5;
 
-//Vertices
-//float *vertices;
-float *verticesNormal;
-//Linhas do arquivo
-int linhas = 1;
-
 int main()
 {
-    //geraVetorNormal();
-
     const float radius = 4.0f;
+
+    //Gera os arquivos com os vetores normais.
+//    geraVetorNormal("res/arquivos/Chamine8.csv"     ,"res/arquivos/Chamine.csv");
+//    geraVetorNormal("res/arquivos/FolhasArvore8.csv","res/arquivos/FolhasArvore.csv");
+//    geraVetorNormal("res/arquivos/Paredes8.csv"     ,"res/arquivos/Paredes.csv");
+//    geraVetorNormal("res/arquivos/PortaJanela8.csv" ,"res/arquivos/PortaJanela.csv");
+//    geraVetorNormal("res/arquivos/Telhado8.csv"     ,"res/arquivos/Telhado.csv");
+//    geraVetorNormal("res/arquivos/TroncoArvore8.csv","res/arquivos/TroncoArvore.csv");
 
     // glfw: initialize and configure
     // ------------------------------
@@ -97,21 +98,24 @@ int main()
     Shader lightCubeShader("light_cube.vs", "light_cube.fs");
 
     //Carregar as coordernadas do desenho no vetor
-    //char arqCasa[] = "res/arquivos/folhasArvore.csv";
-    char arqCasa[] = "arqCasa.csv";
-    int linhasCasa = contarLinhas(arqCasa);
-    float *verticesCasa = (float *)malloc((linhasCasa * 11)*sizeof(float));
-    carregarVetor(verticesCasa,arqCasa);
+    unsigned int texture[6];
+    glGenTextures(6, &texture[0]);
+
+    //Arquivo Chamine
+    char arqChamine[] = "res/arquivos/Chamine.csv";
+    int linhasChamine = contarLinhas(arqChamine);
+    float *verticesChamine = (float *)malloc((linhasChamine * 11)*sizeof(float));
+    carregarVetor(verticesChamine,arqChamine);
 
     // first, configure the cube's VAO (and VBO)
-    unsigned int VBO, casaVAO;
-    glGenVertexArrays(1, &casaVAO);
-    glGenBuffers(1, &VBO);
+    unsigned int ChamineVBO, ChamineVAO;
+    glGenVertexArrays(1, &ChamineVAO);
+    glGenBuffers(1, &ChamineVBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhasCasa*11), &verticesCasa[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, ChamineVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhasChamine*11), &verticesChamine[0], GL_STATIC_DRAW);
 
-    glBindVertexArray(casaVAO);
+    glBindVertexArray(ChamineVAO);
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
@@ -127,9 +131,7 @@ int main()
     glEnableVertexAttribArray(3);
 
     // load and create a texture
-    // -------------------------
-    unsigned int texture[2];
-    glGenTextures(2, &texture[0]);
+    //glGenTextures(6, &texture[0]);
     glBindTexture(GL_TEXTURE_2D, texture[0]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 
     // set the texture wrapping parameters
@@ -153,8 +155,7 @@ int main()
     // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
     // NPOT (Not Power-of-Two)
     //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
-    unsigned char *data = stbi_load("res/images/grama.png", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("res/images/Chamine.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         // Se a imagem for PNG com transparência
@@ -170,15 +171,355 @@ int main()
     }
     stbi_image_free(data);
 
-    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-    unsigned int lightcasaVAO;
-    glGenVertexArrays(1, &lightcasaVAO);
-    glBindVertexArray(lightcasaVAO);
+    //Arquivo FolhasArvore
+    char arqFolhasArvore[] = "res/arquivos/FolhasArvore.csv";
+    int linhasFolhasArvore = contarLinhas(arqFolhasArvore);
+    float *verticesFolhasArvore = (float *)malloc((linhasFolhasArvore * 11)*sizeof(float));
+    carregarVetor(verticesFolhasArvore,arqFolhasArvore);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // note that we update the lamp's position attribute's stride to reflect the updated buffer data
+    // first, configure the cube's VAO (and VBO)
+    unsigned int FolhasArvoreVBO, FolhasArvoreVAO;
+    glGenVertexArrays(1, &FolhasArvoreVAO);
+    glGenBuffers(1, &FolhasArvoreVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, FolhasArvoreVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhasFolhasArvore*11), &verticesFolhasArvore[0], GL_STATIC_DRAW);
+
+    glBindVertexArray(FolhasArvoreVAO);
+
+    // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    // load and create a texture
+    glBindTexture(GL_TEXTURE_2D, texture[1]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+
+    // set the texture wrapping parameters
+    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // set texture filtering parameters
+    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load image, create texture and generate mipmaps
+    // Imagens são carregadas de baixo para cima. Precisam ser invertidas
+    stbi_set_flip_vertically_on_load(1);
+
+    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
+    // NPOT (Not Power-of-Two)
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/FolhasArvore.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        // Se a imagem for PNG com transparência
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        // Se a imagem for JPG, e portanto sem transparência
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    //Arquivo Paredes
+    char arqParedes[] = "res/arquivos/Paredes.csv";
+    int linhasParedes = contarLinhas(arqParedes);
+    float *verticesParedes = (float *)malloc((linhasParedes * 11)*sizeof(float));
+    carregarVetor(verticesParedes,arqParedes);
+
+    // first, configure the cube's VAO (and VBO)
+    unsigned int ParedesVBO, ParedesVAO;
+    glGenVertexArrays(1, &ParedesVAO);
+    glGenBuffers(1, &ParedesVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, ParedesVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhasParedes*11), &verticesParedes[0], GL_STATIC_DRAW);
+
+    glBindVertexArray(ParedesVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    // load and create a texture
+    glBindTexture(GL_TEXTURE_2D, texture[2]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+
+    // set the texture wrapping parameters
+    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // set texture filtering parameters
+    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load image, create texture and generate mipmaps
+    // Imagens são carregadas de baixo para cima. Precisam ser invertidas
+    stbi_set_flip_vertically_on_load(1);
+
+    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
+    // NPOT (Not Power-of-Two)
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/Paredes.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        // Se a imagem for PNG com transparência
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        // Se a imagem for JPG, e portanto sem transparência
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    //Arquivo PortaJanela
+    char arqPortaJanela[] = "res/arquivos/PortaJanela.csv";
+    int linhasPortaJanela = contarLinhas(arqPortaJanela);
+    float *verticesPortaJanela = (float *)malloc((linhasPortaJanela * 11)*sizeof(float));
+    carregarVetor(verticesPortaJanela,arqPortaJanela);
+
+    // first, configure the cube's VAO (and VBO)
+    unsigned int PortaJanelaVBO, PortaJanelaVAO;
+    glGenVertexArrays(1, &PortaJanelaVAO);
+    glGenBuffers(1, &PortaJanelaVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, PortaJanelaVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhasPortaJanela*11), &verticesPortaJanela[0], GL_STATIC_DRAW);
+
+    glBindVertexArray(PortaJanelaVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    // load and create a texture
+    glBindTexture(GL_TEXTURE_2D, texture[3]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+
+    // set the texture wrapping parameters
+    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // set texture filtering parameters
+    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load image, create texture and generate mipmaps
+    // Imagens são carregadas de baixo para cima. Precisam ser invertidas
+    stbi_set_flip_vertically_on_load(1);
+
+    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
+    // NPOT (Not Power-of-Two)
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/PortaJanela.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        // Se a imagem for PNG com transparência
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        // Se a imagem for JPG, e portanto sem transparência
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    //Arquivo Telhado
+    char arqTelhado[] = "res/arquivos/Telhado.csv";
+    int linhasTelhado = contarLinhas(arqTelhado);
+    float *verticesTelhado = (float *)malloc((linhasTelhado * 11)*sizeof(float));
+    carregarVetor(verticesTelhado,arqTelhado);
+
+    // first, configure the cube's VAO (and VBO)
+    unsigned int TelhadoVBO, TelhadoVAO;
+    glGenVertexArrays(1, &TelhadoVAO);
+    glGenBuffers(1, &TelhadoVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, TelhadoVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhasTelhado*11), &verticesTelhado[0], GL_STATIC_DRAW);
+
+    glBindVertexArray(TelhadoVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    // load and create a texture
+    glBindTexture(GL_TEXTURE_2D, texture[4]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+
+    // set the texture wrapping parameters
+    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // set texture filtering parameters
+    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load image, create texture and generate mipmaps
+    // Imagens são carregadas de baixo para cima. Precisam ser invertidas
+    stbi_set_flip_vertically_on_load(1);
+
+    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
+    // NPOT (Not Power-of-Two)
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/Telhado.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        // Se a imagem for PNG com transparência
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        // Se a imagem for JPG, e portanto sem transparência
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    //Arquivo TroncoArvore
+    char arqTroncoArvore[] = "res/arquivos/TroncoArvore.csv";
+    int linhasTroncoArvore = contarLinhas(arqTroncoArvore);
+    float *verticesTroncoArvore = (float *)malloc((linhasTroncoArvore * 11)*sizeof(float));
+    carregarVetor(verticesTroncoArvore,arqTroncoArvore);
+
+    // first, configure the cube's VAO (and VBO)
+    unsigned int TroncoArvoreVBO, TroncoArvoreVAO;
+    glGenVertexArrays(1, &TroncoArvoreVAO);
+    glGenBuffers(1, &TroncoArvoreVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, TroncoArvoreVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhasTroncoArvore*11), &verticesTroncoArvore[0], GL_STATIC_DRAW);
+
+    glBindVertexArray(TroncoArvoreVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    // load and create a texture
+    glBindTexture(GL_TEXTURE_2D, texture[5]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+
+    // set the texture wrapping parameters
+    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // set texture filtering parameters
+    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load image, create texture and generate mipmaps
+    // Imagens são carregadas de baixo para cima. Precisam ser invertidas
+    stbi_set_flip_vertically_on_load(1);
+
+    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
+    // NPOT (Not Power-of-Two)
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/TroncoArvore.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        // Se a imagem for PNG com transparência
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        // Se a imagem for JPG, e portanto sem transparência
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+//    unsigned int lightcasaVAO;
+//    glGenVertexArrays(1, &lightcasaVAO);
+//    glBindVertexArray(lightcasaVAO);
+//
+//    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//    // note that we update the lamp's position attribute's stride to reflect the updated buffer data
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+//    glEnableVertexAttribArray(0);
 
 
     // render loop
@@ -227,9 +568,23 @@ int main()
         lightingShader.setMat4("model", model);
 
         // render the cube
-        glBindVertexArray(casaVAO);
-        glDrawArrays(GL_TRIANGLES, 0, linhasCasa*11);
+        glBindVertexArray(ChamineVAO);
+        glDrawArrays(GL_TRIANGLES, 0, linhasChamine * 11);
 
+        glBindVertexArray(FolhasArvoreVAO);
+        glDrawArrays(GL_TRIANGLES, 0, linhasFolhasArvore * 11);
+
+        glBindVertexArray(ParedesVAO);
+        glDrawArrays(GL_TRIANGLES, 0, linhasParedes * 11);
+
+        glBindVertexArray(PortaJanelaVAO);
+        glDrawArrays(GL_TRIANGLES, 0, linhasPortaJanela * 11);
+
+        glBindVertexArray(TelhadoVAO);
+        glDrawArrays(GL_TRIANGLES, 0, linhasTelhado * 11);
+
+        glBindVertexArray(TroncoArvoreVAO);
+        glDrawArrays(GL_TRIANGLES, 0, linhasTroncoArvore * 11);
 
          //also draw the lamp object
         lightCubeShader.use();
@@ -240,8 +595,8 @@ int main()
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lightCubeShader.setMat4("model", model);
 
-        glBindVertexArray(lightcasaVAO);
-        glDrawArrays(GL_TRIANGLES, 0, linhasCasa);
+        //glBindVertexArray(lightcasaVAO);
+        //glDrawArrays(GL_TRIANGLES, 0, linhasCasa);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -251,9 +606,25 @@ int main()
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &casaVAO);
-    glDeleteVertexArrays(1, &lightcasaVAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &ChamineVAO);
+    glDeleteBuffers(1, &ChamineVBO);
+
+    glDeleteVertexArrays(1, &FolhasArvoreVAO);
+    glDeleteBuffers(1, &FolhasArvoreVBO);
+
+    glDeleteVertexArrays(1, &ParedesVAO);
+    glDeleteBuffers(1, &ParedesVBO);
+
+    glDeleteVertexArrays(1, &PortaJanelaVAO);
+    glDeleteBuffers(1, &PortaJanelaVBO);
+
+    glDeleteVertexArrays(1, &TelhadoVAO);
+    glDeleteBuffers(1, &TelhadoVBO);
+
+    glDeleteVertexArrays(1, &TroncoArvoreVAO);
+    glDeleteBuffers(1, &TroncoArvoreVBO);
+
+    //glDeleteVertexArrays(1, &lightcasaVAO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -302,7 +673,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -334,11 +704,11 @@ int contarLinhas(char arquivoLeitura[])
 {
     int linhas = 0;
     char c;
-    // 1ª abertura do arquivo para Verificar tamanho!
-    FILE *arqin = fopen(arquivoLeitura, "rt"); // é um char criar define
+
+    FILE *arqin = fopen(arquivoLeitura, "rt");
     if (!arqin)
     {
-        printf("Erro na abertura de %s %d\n",arquivoLeitura,strlen(arquivoLeitura));
+        printf("Erro na abertura de %s\n",arquivoLeitura);
         exit(0);
     }
 
@@ -356,16 +726,11 @@ int contarLinhas(char arquivoLeitura[])
 void carregarVetor (float vertices[], char arquivoLeitura[])
 {
     int i = 0;
-    char c;
     char linha[100];
     char *pch;
     char *linhaComentario;
     float *ponteiro = vertices;
 
-    //contarLinhas();
-    //vertices = (float *)malloc((linhas * 11)*sizeof(float));
-
-    //2ª abertura do arquivo para popular Vetor de Vertices
     FILE *arqin = fopen(arquivoLeitura, "rt");
     while (!feof(arqin))
     {
@@ -382,7 +747,6 @@ void carregarVetor (float vertices[], char arquivoLeitura[])
                 if (validarNumerico)
                 {
                     *(ponteiro+i) =  atof(pch);
-                    //vertices[i] =  atof(pch);
 
                     printf("vertices[%d]: %f\n ",i,ponteiro[i]);
                     i++;
@@ -391,109 +755,100 @@ void carregarVetor (float vertices[], char arquivoLeitura[])
                 pch = strtok(NULL, ";"); //Procura próximo token
             }
         }
-
     }
+
     fclose(arqin);
 }
 
-//void geraVetorNormal ()
-//{
-//    int i = 0,z = 0;
-//    int contLinhas = 0;
-//    int controle = 0;
-//    int ultimaPosicao = 0;
-//    char c;
-//    char linha[100];
-//    char *pch;
-//    char *linhaComentario;
-//    int contQuebraLinha = 0;
-//
-//
-//    //contarLinhas();
-//
-//    verticesNormal = (float *)malloc((linhas * 8)*sizeof(float));
-//
-//    //2ª abertura do arquivo para popular Vetor de Vertices
-//    FILE *arqin2 = fopen(arquivo, "rt");
-//    controle = 1;
-//    while (!feof(arqin2) && controle == 1)
-//    {
-//
-//        if(contLinhas == 3)
-//        {
-//            glm::vec3 va(verticesNormal[ultimaPosicao - 24], verticesNormal[ultimaPosicao - 23], verticesNormal[ultimaPosicao - 22]);
-//            //std::cout<<glm::to_string(va)<<std::endl;
-//            glm::vec3 vb(verticesNormal[ultimaPosicao - 16], verticesNormal[ultimaPosicao - 15], verticesNormal[ultimaPosicao - 14]);
-//            //std::cout<<glm::to_string(vb)<<std::endl;
-//            glm::vec3 vc(verticesNormal[ultimaPosicao - 8], verticesNormal[ultimaPosicao - 7], verticesNormal[ultimaPosicao - 6]);
-//            //std::cout<<glm::to_string(vc)<<std::endl;
-//            glm::vec3 normal = normalize(cross(vc - va,vb - va));
-//            //std::cout<<glm::to_string(normal)<<std::endl;
-//
-//
-//            char Str[100];
-//            FILE *arq;
-//
-//            arq = fopen("ArqGrav.csv", "a+");
-//            if (arq == NULL) // Se não conseguiu criar
-//            {
-//                printf("Problemas na CRIACAO do arquivo\n");
-//                return;
-//            }
-//
-//            for (z = (ultimaPosicao - 24); z < ultimaPosicao ; z++)
-//            {
-//                fprintf(arq,"%-5.2f;",verticesNormal[z]);
-//
-//                contQuebraLinha++;
-//                if (contQuebraLinha == 8)
-//                {
-//                    fprintf(arq,"%-5.2f;",normal[0]);
-//                    fprintf(arq,"%-5.2f;",normal[1]);
-//                    fprintf(arq,"%-5.2f;",normal[2]);
-//                    fprintf(arq,"\n");
-//                    contQuebraLinha = 0;
-//                }
-//
-//
-//                //fputs(verticesNormal[z],arq);
-//                //fputs(';',arq);
-//
-//            }
-//            fclose(arq);
-//            contLinhas = 0;
-//            contQuebraLinha = 0;
-//            if (feof(arqin2)){
-//                controle = 0;
-//            }
-//        }
-//        else
-//        {
-//
-//            fgets(linha, 100, arqin2);
-//            linhaComentario = strstr(linha, "//");
-//
-//            if (linhaComentario == NULL)
-//            {
-//                contLinhas++;
-//                pch = strtok(linha, ";");
-//                while (pch != NULL) //Enquanto houver token
-//                {
-//                    int validarNumerico = strcmp(pch,"\n");
-//                    if (validarNumerico)
-//                    {
-//                        *(verticesNormal+i) =  atof(pch);
-//                        //printf("verticesNormal[%d]: %f\n ",i,verticesNormal[i]);
-//                        i++;
-//                        ultimaPosicao = i;
-//                    }
-//                    pch = strtok(NULL, ";"); //Procura próximo token
-//                }
-//            }
-//        }
-//    }
-//    fclose(arqin2);
-//}
+void geraVetorNormal (char nomeArquivoLeitura[], char nomeArquivoEscrita[])
+{
+    int i = 0,z = 0;
+    int contLinhas = 0;
+    int controle = 0;
+    int ultimaPosicao = 0;
+    char linha[100];
+    char *pch;
+    char *linhaComentario;
+    int contQuebraLinha = 0;
+
+    int linhasVetorNormal = contarLinhas(nomeArquivoLeitura);
+    float *verticesNormal = (float *)malloc((linhasVetorNormal * 8)*sizeof(float));
+
+    //Abre arquivo de escrita
+    FILE *arquivoEscrita = fopen(nomeArquivoEscrita, "a+");
+    if (arquivoEscrita == NULL)
+    {
+        printf("Problemas na CRIACAO do arquivo\n");
+        return;
+    }
+
+    //Abre arquivo de leitura
+    FILE *ArquivoLeitura = fopen(nomeArquivoLeitura, "rt");
+    controle = 1;
+    while (!feof(ArquivoLeitura) && controle == 1)
+    {
+        if(contLinhas == 3)
+        {
+            glm::vec3 va(verticesNormal[ultimaPosicao - 24 ], verticesNormal[ultimaPosicao - 23], verticesNormal[ultimaPosicao - 22]);
+            //std::cout<<glm::to_string(va)<<std::endl;
+            glm::vec3 vb(verticesNormal[ultimaPosicao - 16], verticesNormal[ultimaPosicao - 15], verticesNormal[ultimaPosicao - 14]);
+            //std::cout<<glm::to_string(vb)<<std::endl;
+            glm::vec3 vc(verticesNormal[ultimaPosicao - 8], verticesNormal[ultimaPosicao - 7], verticesNormal[ultimaPosicao - 6]);
+            //std::cout<<glm::to_string(vc)<<std::endl;
+            glm::vec3 normal = normalize(cross(vc - va,vb - va));
+            //std::cout<<glm::to_string(normal)<<std::endl;
+
+            for (z = (ultimaPosicao - 24); z < ultimaPosicao ; z++)
+            {
+                fprintf(arquivoEscrita,"%-5.2f;",verticesNormal[z]);
+
+                contQuebraLinha++;
+                if (contQuebraLinha == 8)
+                {
+                    fprintf(arquivoEscrita,"%-5.2f;",normal[0]);
+                    fprintf(arquivoEscrita,"%-5.2f;",normal[1]);
+                    fprintf(arquivoEscrita,"%-5.2f;",normal[2]);
+                    fprintf(arquivoEscrita,"\n");
+                    contQuebraLinha = 0;
+                }
+            }
+
+            contLinhas = 0;
+            contQuebraLinha = 0;
+
+            if (feof(ArquivoLeitura)){
+                controle = 0;
+            }
+        }
+        else
+        {
+            fgets(linha, 100, ArquivoLeitura);
+            linhaComentario = strstr(linha, "//");
+
+            if (linhaComentario == NULL)
+            {
+                contLinhas++;
+                pch = strtok(linha, ";");
+
+                while (pch != NULL) //Enquanto houver token
+                {
+                    int validarNumerico = strcmp(pch,"\n");
+                    if (validarNumerico)
+                    {
+                        *(verticesNormal + i) =  atof(pch);
+                        //printf("verticesNormal[%d]: %f\n ",i,verticesNormal[i]);
+                        i++;
+                        ultimaPosicao = i;
+                    }
+                    pch = strtok(NULL, ";"); //Procura próximo token
+                }
+            }
+        }
+    }
+
+    fclose(arquivoEscrita);
+    fclose(ArquivoLeitura);
+}
 
 
 
