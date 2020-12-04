@@ -10,14 +10,14 @@
 #include <iostream>
 
 
-#define arquivo "ArqGrav.csv"
+//#define arquivo "ArqGrav.csv"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-void contarLinhas();
-void carregarVetor();
+int contarLinhas(char arquivoLeitura[]);
+void carregarVetor (float *vertices, char arquivoLeitura[]);
 void geraVetorNormal ();
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -40,7 +40,7 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 float specularStrength = 0.5;
 
 //Vertices
-float *vertices;
+//float *vertices;
 float *verticesNormal;
 //Linhas do arquivo
 int linhas = 1;
@@ -76,8 +76,6 @@ int main()
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    // tell GLFW to capture our mouse
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glew: load all OpenGL function pointers
     // ---------------------------------------
@@ -98,15 +96,18 @@ int main()
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightingShader("phong_lighting.vs", "phong_lighting.fs");
-    // Iluminação pelo modelo de Gourad
-    //Shader lightingShader("gourad_lighting.vs", "gourad_lighting.fs");
-    // Phong no espaço de visualização ao invés de no espaço mundial
-    //Shader lightingShader("model_lighting.vs", "model_lighting.fs");
 
     Shader lightCubeShader("light_cube.vs", "light_cube.fs");
 
     //Carregar as coordernadas do desenho no vetor
-    carregarVetor();
+
+
+    //float *vertices = (float *)malloc((linhas * 8)*sizeof(float));
+
+    char arqCasa[] = "arqCasa.csv";
+    int linhasCasa = contarLinhas(arqCasa);
+    float *verticesCasa = (float *)malloc((linhasCasa * 11)*sizeof(float));
+    carregarVetor(verticesCasa,arqCasa);
 
 
     // first, configure the cube's VAO (and VBO)
@@ -115,7 +116,7 @@ int main()
     glGenBuffers(1, &VBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhas*11), &vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhasCasa*11), &verticesCasa[0], GL_STATIC_DRAW);
 
     glBindVertexArray(casaVAO);
 
@@ -133,14 +134,14 @@ int main()
     glEnableVertexAttribArray(3);
 
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-//    unsigned int lightcasaVAO;
-//    glGenVertexArrays(1, &lightcasaVAO);
-//    glBindVertexArray(lightcasaVAO);
+    unsigned int lightcasaVAO;
+    glGenVertexArrays(1, &lightcasaVAO);
+    glBindVertexArray(lightcasaVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // note that we update the lamp's position attribute's stride to reflect the updated buffer data
-   // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
 
     // render loop
@@ -164,8 +165,8 @@ int main()
 
 
         //Luz dando volta no Objeto!
-//        lightPos.x = sin(glfwGetTime()) * radius;
-//        lightPos.y = cos(glfwGetTime()) * radius;
+        lightPos.x = sin(glfwGetTime()) * radius;
+        lightPos.y = cos(glfwGetTime()) * radius;
 
 
         // be sure to activate shader when setting uniforms/drawing objects
@@ -190,7 +191,7 @@ int main()
 
         // render the cube
         glBindVertexArray(casaVAO);
-        glDrawArrays(GL_TRIANGLES, 0, linhas*11);
+        glDrawArrays(GL_TRIANGLES, 0, linhasCasa*11);
 
 
         // also draw the lamp object
@@ -203,7 +204,7 @@ int main()
         //lightCubeShader.setMat4("model", model);
 
 //        glBindVertexArray(lightcasaVAO);
-        glDrawArrays(GL_TRIANGLES, 0, linhas);
+        glDrawArrays(GL_TRIANGLES, 0, linhasCasa);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -292,15 +293,15 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     camera.ProcessMouseScroll(yoffset);
 }
 
-void contarLinhas()
+int contarLinhas(char arquivoLeitura[])
 {
+    int linhas = 0;
     char c;
-
     // 1ª abertura do arquivo para Verificar tamanho!
-    FILE *arqin = fopen(arquivo, "rt"); // é um char criar define
+    FILE *arqin = fopen(arquivoLeitura, "rt"); // é um char criar define
     if (!arqin)
     {
-        printf("Erro na abertura de %s %d\n",arquivo,strlen(arquivo));
+        printf("Erro na abertura de %s %d\n",arquivoLeitura,strlen(arquivoLeitura));
         exit(0);
     }
 
@@ -312,21 +313,23 @@ void contarLinhas()
     printf("Linhas: %d \n",linhas);
 
     fclose(arqin);
+    return linhas;
 }
 
-void carregarVetor ()
+void carregarVetor (float vertices[], char arquivoLeitura[])
 {
     int i = 0;
     char c;
     char linha[100];
     char *pch;
     char *linhaComentario;
+    float *ponteiro = vertices;
 
-    contarLinhas();
-    vertices = (float *)malloc((linhas * 11)*sizeof(float));
+    //contarLinhas();
+    //vertices = (float *)malloc((linhas * 11)*sizeof(float));
 
     //2ª abertura do arquivo para popular Vetor de Vertices
-    FILE *arqin = fopen(arquivo, "rt");
+    FILE *arqin = fopen(arquivoLeitura, "rt");
     while (!feof(arqin))
     {
         fgets(linha, 100, arqin);
@@ -341,10 +344,10 @@ void carregarVetor ()
                 int validarNumerico = strcmp(pch,"\n");
                 if (validarNumerico)
                 {
-                    *(vertices+i) =  atof(pch);
+                    *(ponteiro+i) =  atof(pch);
                     //vertices[i] =  atof(pch);
 
-                    printf("vertices[%d]: %f\n ",i,vertices[i]);
+                    printf("vertices[%d]: %f\n ",i,ponteiro[i]);
                     i++;
                 }
 
@@ -353,121 +356,107 @@ void carregarVetor ()
         }
 
     }
-
     fclose(arqin);
 }
 
-void geraVetorNormal ()
-{
-    int i = 0,z = 0;
-    int contLinhas = 0;
-    int controle = 0;
-    int ultimaPosicao = 0;
-    char c;
-    char linha[100];
-    char *pch;
-    char *linhaComentario;
-    int contQuebraLinha = 0;
-
-
-    contarLinhas();
-
-    verticesNormal = (float *)malloc((linhas * 8)*sizeof(float));
-
-    //2ª abertura do arquivo para popular Vetor de Vertices
-    FILE *arqin2 = fopen(arquivo, "rt");
-    controle = 1;
-    while (!feof(arqin2) && controle == 1)
-    {
-
-        if(contLinhas == 3)
-        {
-            glm::vec3 va(verticesNormal[ultimaPosicao - 24], verticesNormal[ultimaPosicao - 23], verticesNormal[ultimaPosicao - 22]);
-            //std::cout<<glm::to_string(va)<<std::endl;
-            glm::vec3 vb(verticesNormal[ultimaPosicao - 16], verticesNormal[ultimaPosicao - 15], verticesNormal[ultimaPosicao - 14]);
-            //std::cout<<glm::to_string(vb)<<std::endl;
-            glm::vec3 vc(verticesNormal[ultimaPosicao - 8], verticesNormal[ultimaPosicao - 7], verticesNormal[ultimaPosicao - 6]);
-            //std::cout<<glm::to_string(vc)<<std::endl;
-            glm::vec3 normal = normalize(cross(vc - va,vb - va));
-            //std::cout<<glm::to_string(normal)<<std::endl;
-
-
-            char Str[100];
-            FILE *arq;
-
-            arq = fopen("ArqGrav.csv", "a+");
-            if (arq == NULL) // Se não conseguiu criar
-            {
-                printf("Problemas na CRIACAO do arquivo\n");
-                return;
-            }
-
-            for (z = (ultimaPosicao - 24); z < ultimaPosicao ; z++)
-            {
-                fprintf(arq,"%-5.2f;",verticesNormal[z]);
-
-                contQuebraLinha++;
-                if (contQuebraLinha == 8)
-                {
-                    fprintf(arq,"%-5.2f;",normal[0]);
-                    fprintf(arq,"%-5.2f;",normal[1]);
-                    fprintf(arq,"%-5.2f;",normal[2]);
-                    fprintf(arq,"\n");
-                    contQuebraLinha = 0;
-                }
-
-
-                //fputs(verticesNormal[z],arq);
-                //fputs(';',arq);
-
-            }
-            fclose(arq);
-            contLinhas = 0;
-            contQuebraLinha = 0;
-            if (feof(arqin2)){
-                controle = 0;
-            }
-        }
-        else
-        {
-
-            fgets(linha, 100, arqin2);
-            linhaComentario = strstr(linha, "//");
-
-            if (linhaComentario == NULL)
-            {
-                contLinhas++;
-                pch = strtok(linha, ";");
-                while (pch != NULL) //Enquanto houver token
-                {
-                    int validarNumerico = strcmp(pch,"\n");
-                    if (validarNumerico)
-                    {
-                        *(verticesNormal+i) =  atof(pch);
-                        //printf("verticesNormal[%d]: %f\n ",i,verticesNormal[i]);
-                        i++;
-                        ultimaPosicao = i;
-                    }
-                    pch = strtok(NULL, ";"); //Procura próximo token
-                }
-            }
-        }
-    }
-
-
-//   glm::vec3 va(0.50 ,0.50 ,-0.50);
-//    glm::vec3 vb(0.50 ,0.50 ,-0.50);
-//    glm::vec3 vc(-0.50,0.50 ,-0.50);
+//void geraVetorNormal ()
+//{
+//    int i = 0,z = 0;
+//    int contLinhas = 0;
+//    int controle = 0;
+//    int ultimaPosicao = 0;
+//    char c;
+//    char linha[100];
+//    char *pch;
+//    char *linhaComentario;
+//    int contQuebraLinha = 0;
 //
 //
+//    //contarLinhas();
 //
-//    glm::vec3 normal = normalize(cross(vc - va,vb - va));
+//    verticesNormal = (float *)malloc((linhas * 8)*sizeof(float));
 //
-//    std::cout<<glm::to_string(normal)<<std::endl;
-
-
-    fclose(arqin2);
-}
+//    //2ª abertura do arquivo para popular Vetor de Vertices
+//    FILE *arqin2 = fopen(arquivo, "rt");
+//    controle = 1;
+//    while (!feof(arqin2) && controle == 1)
+//    {
+//
+//        if(contLinhas == 3)
+//        {
+//            glm::vec3 va(verticesNormal[ultimaPosicao - 24], verticesNormal[ultimaPosicao - 23], verticesNormal[ultimaPosicao - 22]);
+//            //std::cout<<glm::to_string(va)<<std::endl;
+//            glm::vec3 vb(verticesNormal[ultimaPosicao - 16], verticesNormal[ultimaPosicao - 15], verticesNormal[ultimaPosicao - 14]);
+//            //std::cout<<glm::to_string(vb)<<std::endl;
+//            glm::vec3 vc(verticesNormal[ultimaPosicao - 8], verticesNormal[ultimaPosicao - 7], verticesNormal[ultimaPosicao - 6]);
+//            //std::cout<<glm::to_string(vc)<<std::endl;
+//            glm::vec3 normal = normalize(cross(vc - va,vb - va));
+//            //std::cout<<glm::to_string(normal)<<std::endl;
+//
+//
+//            char Str[100];
+//            FILE *arq;
+//
+//            arq = fopen("ArqGrav.csv", "a+");
+//            if (arq == NULL) // Se não conseguiu criar
+//            {
+//                printf("Problemas na CRIACAO do arquivo\n");
+//                return;
+//            }
+//
+//            for (z = (ultimaPosicao - 24); z < ultimaPosicao ; z++)
+//            {
+//                fprintf(arq,"%-5.2f;",verticesNormal[z]);
+//
+//                contQuebraLinha++;
+//                if (contQuebraLinha == 8)
+//                {
+//                    fprintf(arq,"%-5.2f;",normal[0]);
+//                    fprintf(arq,"%-5.2f;",normal[1]);
+//                    fprintf(arq,"%-5.2f;",normal[2]);
+//                    fprintf(arq,"\n");
+//                    contQuebraLinha = 0;
+//                }
+//
+//
+//                //fputs(verticesNormal[z],arq);
+//                //fputs(';',arq);
+//
+//            }
+//            fclose(arq);
+//            contLinhas = 0;
+//            contQuebraLinha = 0;
+//            if (feof(arqin2)){
+//                controle = 0;
+//            }
+//        }
+//        else
+//        {
+//
+//            fgets(linha, 100, arqin2);
+//            linhaComentario = strstr(linha, "//");
+//
+//            if (linhaComentario == NULL)
+//            {
+//                contLinhas++;
+//                pch = strtok(linha, ";");
+//                while (pch != NULL) //Enquanto houver token
+//                {
+//                    int validarNumerico = strcmp(pch,"\n");
+//                    if (validarNumerico)
+//                    {
+//                        *(verticesNormal+i) =  atof(pch);
+//                        //printf("verticesNormal[%d]: %f\n ",i,verticesNormal[i]);
+//                        i++;
+//                        ultimaPosicao = i;
+//                    }
+//                    pch = strtok(NULL, ";"); //Procura próximo token
+//                }
+//            }
+//        }
+//    }
+//    fclose(arqin2);
+//}
 
 
 
