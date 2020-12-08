@@ -70,11 +70,11 @@ int main()
         glfwTerminate();
         return -1;
     }
+
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-
 
     // glew: load all OpenGL function pointers
     // ---------------------------------------
@@ -130,19 +130,14 @@ int main()
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
     glEnableVertexAttribArray(3);
 
-    // load and create a texture
-    //glGenTextures(6, &texture[0]);
-    glBindTexture(GL_TEXTURE_2D, texture[0]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    // load and create a texture;
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
 
     // set the texture wrapping parameters
-    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // set texture filtering parameters
-    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -152,26 +147,19 @@ int main()
     // Imagens são carregadas de baixo para cima. Precisam ser invertidas
     stbi_set_flip_vertically_on_load(1);
 
-    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
-    // NPOT (Not Power-of-Two)
-    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    unsigned char *data = stbi_load("res/images/Chamine.png", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("res/images/Paredes.png", &width, &height, &nrChannels, 0);
     if (data)
     {
-        // Se a imagem for PNG com transparência
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        // Se a imagem for JPG, e portanto sem transparência
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture1" << std::endl;
     }
     stbi_image_free(data);
 
-    //Arquivo FolhasArvore
+//    //Arquivo FolhasArvore
     char arqFolhasArvore[] = "res/arquivos/FolhasArvore.csv";
     int linhasFolhasArvore = contarLinhas(arqFolhasArvore);
     float *verticesFolhasArvore = (float *)malloc((linhasFolhasArvore * 11)*sizeof(float));
@@ -226,20 +214,16 @@ int main()
     data = stbi_load("res/images/FolhasArvore.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
-        // Se a imagem for PNG com transparência
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        // Se a imagem for JPG, e portanto sem transparência
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture2" << std::endl;
     }
     stbi_image_free(data);
 
-    //Arquivo Paredes
+//    //Arquivo Paredes
     char arqParedes[] = "res/arquivos/Paredes.csv";
     int linhasParedes = contarLinhas(arqParedes);
     float *verticesParedes = (float *)malloc((linhasParedes * 11)*sizeof(float));
@@ -272,14 +256,10 @@ int main()
     glBindTexture(GL_TEXTURE_2D, texture[2]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 
     // set the texture wrapping parameters
-    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // set texture filtering parameters
-    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -287,23 +267,15 @@ int main()
     // Imagens são carregadas de baixo para cima. Precisam ser invertidas
     stbi_set_flip_vertically_on_load(1);
 
-    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
-    // NPOT (Not Power-of-Two)
-    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
     data = stbi_load("res/images/Paredes.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
-        // Se a imagem for PNG com transparência
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        // Se a imagem for JPG, e portanto sem transparência
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture3" << std::endl;
     }
     stbi_image_free(data);
 
@@ -340,14 +312,10 @@ int main()
     glBindTexture(GL_TEXTURE_2D, texture[3]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 
     // set the texture wrapping parameters
-    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // set texture filtering parameters
-    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -355,27 +323,19 @@ int main()
     // Imagens são carregadas de baixo para cima. Precisam ser invertidas
     stbi_set_flip_vertically_on_load(1);
 
-    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
-    // NPOT (Not Power-of-Two)
-    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
     data = stbi_load("res/images/PortaJanela.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
-        // Se a imagem for PNG com transparência
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        // Se a imagem for JPG, e portanto sem transparência
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture4" << std::endl;
     }
     stbi_image_free(data);
 
-    //Arquivo Telhado
+//    //Arquivo Telhado
     char arqTelhado[] = "res/arquivos/Telhado.csv";
     int linhasTelhado = contarLinhas(arqTelhado);
     float *verticesTelhado = (float *)malloc((linhasTelhado * 11)*sizeof(float));
@@ -408,14 +368,10 @@ int main()
     glBindTexture(GL_TEXTURE_2D, texture[4]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 
     // set the texture wrapping parameters
-    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // set texture filtering parameters
-    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -423,23 +379,15 @@ int main()
     // Imagens são carregadas de baixo para cima. Precisam ser invertidas
     stbi_set_flip_vertically_on_load(1);
 
-    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
-    // NPOT (Not Power-of-Two)
-    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
-    data = stbi_load("res/images/Telhado.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/Telhado.png", &width, &height, &nrChannels, 0);
     if (data)
     {
-        // Se a imagem for PNG com transparência
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        // Se a imagem for JPG, e portanto sem transparência
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture5" << std::endl;
     }
     stbi_image_free(data);
 
@@ -476,14 +424,10 @@ int main()
     glBindTexture(GL_TEXTURE_2D, texture[5]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 
     // set the texture wrapping parameters
-    // Podem ser GL_REPEAT. GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // set texture filtering parameters
-    // Podem ser GL_LINEAR, GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -491,23 +435,15 @@ int main()
     // Imagens são carregadas de baixo para cima. Precisam ser invertidas
     stbi_set_flip_vertically_on_load(1);
 
-    // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
-    // NPOT (Not Power-of-Two)
-    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
-    data = stbi_load("res/images/TroncoArvore.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/TroncoArvore.png", &width, &height, &nrChannels, 0);
     if (data)
     {
-        // Se a imagem for PNG com transparência
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        // Se a imagem for JPG, e portanto sem transparência
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture6" << std::endl;
     }
     stbi_image_free(data);
 
@@ -540,8 +476,6 @@ int main()
         // ------
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glBindTexture(GL_TEXTURE_2D, texture[0]);
 
         //Luz dando volta no Objeto!
         lightPos.x = sin(glfwGetTime()*0.5) * radius;
