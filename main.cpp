@@ -98,8 +98,8 @@ int main()
     Shader lightCubeShader("light_cube.vs", "light_cube.fs");
 
     //Carregar as coordernadas do desenho no vetor
-    unsigned int texture[6];
-    glGenTextures(6, &texture[0]);
+    unsigned int texture[7];
+    glGenTextures(7, &texture[0]);
 
     //Arquivo Chamine
     char arqChamine[] = "res/arquivos/Chamine.csv";
@@ -382,7 +382,7 @@ int main()
     // Imagens são carregadas de baixo para cima. Precisam ser invertidas
     stbi_set_flip_vertically_on_load(1);
 
-    data = stbi_load("res/images/PortaJanela.png", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/Telhado.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -452,15 +452,63 @@ int main()
     }
     stbi_image_free(data);
 
-    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-//    unsigned int lightcasaVAO;
-//    glGenVertexArrays(1, &lightcasaVAO);
-//    glBindVertexArray(lightcasaVAO);
-//
-//    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//    // note that we update the lamp's position attribute's stride to reflect the updated buffer data
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
-//    glEnableVertexAttribArray(0);
+        //Arquivo Sol
+    char arqSol[] = "res/arquivos/Sol.csv";
+    int linhasSol = contarLinhas(arqSol);
+    float *verticesSol = (float *)malloc((linhasSol * 11)*sizeof(float));
+    carregarVetor(verticesSol,arqSol);
+
+    // first, configure the cube's VAO (and VBO)
+    unsigned int SolVBO, SolVAO;
+    glGenVertexArrays(1, &SolVAO);
+    glGenBuffers(1, &SolVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, SolVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*(linhasSol*11), &verticesSol[0], GL_STATIC_DRAW);
+
+    glBindVertexArray(SolVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    // load and create a texture
+    glBindTexture(GL_TEXTURE_2D, texture[6]); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load image, create texture and generate mipmaps
+    // Imagens são carregadas de baixo para cima. Precisam ser invertidas
+    stbi_set_flip_vertically_on_load(1);
+
+    data = stbi_load("res/images/Sol.png", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << "success to load texture Sol" << std::endl;
+    }
+    else
+    {
+        std::cout << "Failed to load texture Sol" << std::endl;
+    }
+    stbi_image_free(data);
+
 
 
     // render loop
@@ -493,6 +541,7 @@ int main()
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
         lightingShader.setFloat("specularStrength",specularStrength);
+
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -531,17 +580,20 @@ int main()
         glBindVertexArray(TroncoArvoreVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhasTroncoArvore * 11);
 
+
+
          //also draw the lamp object
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        model = glm::scale(model, glm::vec3(10.0f)); // a smaller cube
         lightCubeShader.setMat4("model", model);
 
-        //glBindVertexArray(lightcasaVAO);
-        //glDrawArrays(GL_TRIANGLES, 0, linhasCasa);
+        glBindTexture(GL_TEXTURE_2D, texture[6]);
+        glBindVertexArray(SolVAO);
+        glDrawArrays(GL_TRIANGLES, 0, linhasSol*11);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -568,6 +620,10 @@ int main()
 
     glDeleteVertexArrays(1, &TroncoArvoreVAO);
     glDeleteBuffers(1, &TroncoArvoreVBO);
+
+    glDeleteVertexArrays(1, &SolVAO);
+    glDeleteBuffers(1, &SolVBO);
+
 
     //glDeleteVertexArrays(1, &lightcasaVAO);
 
