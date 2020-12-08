@@ -152,6 +152,7 @@ int main()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << "success to load texture1" << std::endl;
     }
     else
     {
@@ -210,12 +211,12 @@ int main()
     // Corrige o alinhamento da imagem em imagens cujas dimensões não são potências de dois
     // NPOT (Not Power-of-Two)
     //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //unsigned char *data = stbi_load("res/images/gremio.jpg", &width, &height, &nrChannels, 0);
-    data = stbi_load("res/images/FolhasArvore.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/FolhasArvore.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << "success to load texture2" << std::endl;
     }
     else
     {
@@ -267,11 +268,12 @@ int main()
     // Imagens são carregadas de baixo para cima. Precisam ser invertidas
     stbi_set_flip_vertically_on_load(1);
 
-    data = stbi_load("res/images/Paredes.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/Paredes.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << "success to load texture3" << std::endl;
     }
     else
     {
@@ -323,11 +325,12 @@ int main()
     // Imagens são carregadas de baixo para cima. Precisam ser invertidas
     stbi_set_flip_vertically_on_load(1);
 
-    data = stbi_load("res/images/PortaJanela.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/PortaJanela.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << "success to load texture4" << std::endl;
     }
     else
     {
@@ -379,11 +382,12 @@ int main()
     // Imagens são carregadas de baixo para cima. Precisam ser invertidas
     stbi_set_flip_vertically_on_load(1);
 
-    data = stbi_load("res/images/Telhado.png", &width, &height, &nrChannels, 0);
+    data = stbi_load("res/images/PortaJanela.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << "success to load texture5" << std::endl;
     }
     else
     {
@@ -440,6 +444,7 @@ int main()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << "success to load texture6" << std::endl;
     }
     else
     {
