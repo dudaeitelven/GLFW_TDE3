@@ -502,21 +502,27 @@ int main()
         lightingShader.setMat4("model", model);
 
         // render the cube
+        glBindTexture(GL_TEXTURE_2D, texture[0]);
         glBindVertexArray(ChamineVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhasChamine * 11);
 
+        glBindTexture(GL_TEXTURE_2D, texture[1]);
         glBindVertexArray(FolhasArvoreVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhasFolhasArvore * 11);
 
+        glBindTexture(GL_TEXTURE_2D, texture[2]);
         glBindVertexArray(ParedesVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhasParedes * 11);
 
+        glBindTexture(GL_TEXTURE_2D, texture[3]);
         glBindVertexArray(PortaJanelaVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhasPortaJanela * 11);
 
+        glBindTexture(GL_TEXTURE_2D, texture[4]);
         glBindVertexArray(TelhadoVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhasTelhado * 11);
 
+        glBindTexture(GL_TEXTURE_2D, texture[5]);
         glBindVertexArray(TroncoArvoreVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhasTroncoArvore * 11);
 
