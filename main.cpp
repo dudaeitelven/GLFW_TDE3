@@ -624,9 +624,6 @@ int main()
     glDeleteVertexArrays(1, &SolVAO);
     glDeleteBuffers(1, &SolVBO);
 
-
-    //glDeleteVertexArrays(1, &lightcasaVAO);
-
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
