@@ -33,7 +33,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(1.2f, 1.0f, 0.0f);
 
 // Reflexo especular
 float specularStrength = 0.5;
@@ -152,15 +152,15 @@ int main()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-        std::cout << "success to load texture1" << std::endl;
+        std::cout << "success to load texture Chamine" << std::endl;
     }
     else
     {
-        std::cout << "Failed to load texture1" << std::endl;
+        std::cout << "Failed to load texture Chamine" << std::endl;
     }
     stbi_image_free(data);
 
-//    //Arquivo FolhasArvore
+    //Arquivo FolhasArvore
     char arqFolhasArvore[] = "res/arquivos/FolhasArvore.csv";
     int linhasFolhasArvore = contarLinhas(arqFolhasArvore);
     float *verticesFolhasArvore = (float *)malloc((linhasFolhasArvore * 11)*sizeof(float));
@@ -216,15 +216,15 @@ int main()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-        std::cout << "success to load texture2" << std::endl;
+        std::cout << "success to load texture FolhasArvore" << std::endl;
     }
     else
     {
-        std::cout << "Failed to load texture2" << std::endl;
+        std::cout << "Failed to load texture FolhasArvore" << std::endl;
     }
     stbi_image_free(data);
 
-//    //Arquivo Paredes
+    //Arquivo Paredes
     char arqParedes[] = "res/arquivos/Paredes.csv";
     int linhasParedes = contarLinhas(arqParedes);
     float *verticesParedes = (float *)malloc((linhasParedes * 11)*sizeof(float));
@@ -273,11 +273,11 @@ int main()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-        std::cout << "success to load texture3" << std::endl;
+        std::cout << "success to load texture Paredes" << std::endl;
     }
     else
     {
-        std::cout << "Failed to load texture3" << std::endl;
+        std::cout << "Failed to load texture Paredes" << std::endl;
     }
     stbi_image_free(data);
 
@@ -330,15 +330,15 @@ int main()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-        std::cout << "success to load texture4" << std::endl;
+        std::cout << "success to load texture PortaJanela" << std::endl;
     }
     else
     {
-        std::cout << "Failed to load texture4" << std::endl;
+        std::cout << "Failed to load texture PortaJanela" << std::endl;
     }
     stbi_image_free(data);
 
-//    //Arquivo Telhado
+    //Arquivo Telhado
     char arqTelhado[] = "res/arquivos/Telhado.csv";
     int linhasTelhado = contarLinhas(arqTelhado);
     float *verticesTelhado = (float *)malloc((linhasTelhado * 11)*sizeof(float));
@@ -387,11 +387,11 @@ int main()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-        std::cout << "success to load texture5" << std::endl;
+        std::cout << "success to load texture Telhado" << std::endl;
     }
     else
     {
-        std::cout << "Failed to load texture5" << std::endl;
+        std::cout << "Failed to load texture Telhado" << std::endl;
     }
     stbi_image_free(data);
 
@@ -444,15 +444,15 @@ int main()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-        std::cout << "success to load texture6" << std::endl;
+        std::cout << "success to load texture TroncoArvore" << std::endl;
     }
     else
     {
-        std::cout << "Failed to load texture6" << std::endl;
+        std::cout << "Failed to load texture TroncoArvore" << std::endl;
     }
     stbi_image_free(data);
 
-        //Arquivo Sol
+    //Arquivo Sol
     char arqSol[] = "res/arquivos/Sol.csv";
     int linhasSol = contarLinhas(arqSol);
     float *verticesSol = (float *)malloc((linhasSol * 11)*sizeof(float));
@@ -510,9 +510,7 @@ int main()
     stbi_image_free(data);
 
 
-
     // render loop
-    // -----------
     while (!glfwWindowShouldClose(window))
     {
         // per-frame time logic
@@ -542,7 +540,6 @@ int main()
         lightingShader.setVec3("viewPos", camera.Position);
         lightingShader.setFloat("specularStrength",specularStrength);
 
-
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
@@ -551,8 +548,6 @@ int main()
 
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
-        // Demonstra o problema da distorção do vetor normal
-        //model = glm::scale(model, glm::vec3(0.5f, 0.2f, 3.0f)); // transformação de escala não linear
         lightingShader.setMat4("model", model);
 
         // render the cube
@@ -580,9 +575,7 @@ int main()
         glBindVertexArray(TroncoArvoreVAO);
         glDrawArrays(GL_TRIANGLES, 0, linhasTroncoArvore * 11);
 
-
-
-         //also draw the lamp object
+        //also draw the lamp object
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
@@ -847,7 +840,3 @@ void geraVetorNormal (char nomeArquivoLeitura[], char nomeArquivoEscrita[])
     fclose(arquivoEscrita);
     fclose(ArquivoLeitura);
 }
-
-
-
-
